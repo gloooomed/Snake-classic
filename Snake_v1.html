@@ -80,16 +80,17 @@
             color: #1a252f;
         }
         
-        .title {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        
+        /* Modified header to include high score */
         .score {
             font-size: 1rem;
             margin-bottom: 15px;
         }
         
+        .title {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
         .game-area {
             background: #1a252f;
             border: 2px solid #000;
@@ -102,12 +103,21 @@
             background: #1a252f;
         }
         
-        .controls {
-            margin-top: 15px;
+        /* Pause overlay styling */
+        .pause-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #9bb560;
+            border: 3px solid #1a252f;
+            padding: 20px;
             text-align: center;
             color: #1a252f;
-            font-size: 0.8rem;
-            line-height: 1.4;
+            font-weight: bold;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            display: none;
         }
         
         .game-over, .start-screen {
@@ -162,11 +172,18 @@
     </style>
 </head>
 <body>
+    <!-- Audio elements for sound effects -->
+    <audio id="eatSound" src="assets/eat.wav"></audio>
+    <audio id="gameOverSound" src="assets/gameover.wav"></audio>
+
     <div class="phone-container">
         <div class="screen">
             <div class="header">
                 <div class="title">SNAKE</div>
-                <div class="score">Score: <span id="score">0</span></div>
+                <!-- Modified header to show score and high score -->
+                <div class="score">
+                    Score: <span id="score">0</span> | High Score: <span id="highScore">0</span>
+                </div>
             </div>
             
             <div class="game-area">
@@ -184,6 +201,12 @@
                     <div style="font-size: 0.9rem; margin-bottom: 15px;">Score: <span id="finalScore">0</span></div>
                     <button class="btn" onclick="restartGame()">RESTART</button>
                 </div>
+                
+                <!-- Pause overlay -->
+                <div class="pause-screen" id="pauseScreen">
+                    PAUSED<br>
+                    Press "P" to resume
+                </div>
             </div>
             
             <div class="controls">
@@ -197,9 +220,13 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('highScore');
         const startScreen = document.getElementById('startScreen');
         const gameOverScreen = document.getElementById('gameOver');
+        const pauseScreen = document.getElementById('pauseScreen');
         const finalScoreElement = document.getElementById('finalScore');
+        const eatSound = document.getElementById('eatSound');
+        const gameOverSound = document.getElementById('gameOverSound');
 
         const gridSize = 15;
         const tileCount = canvas.width / gridSize;
@@ -211,6 +238,9 @@
         let score = 0;
         let gameRunning = false;
         let gameStarted = false;
+        let paused = false;
+        let highScore = Number(localStorage.getItem('highScore')) || 0;
+        highScoreElement.textContent = highScore;
 
         function randomFood() {
             food = {
@@ -271,6 +301,8 @@
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 scoreElement.textContent = score;
+                // Play sound effect for eating food
+                if(eatSound) { eatSound.play(); }
                 randomFood();
             } else {
                 snake.pop();
@@ -279,7 +311,8 @@
 
         function gameLoop() {
             if (!gameRunning) return;
-            
+            if (paused) return; // if paused, stop the loop
+
             moveSnake();
             drawGame();
             
@@ -289,8 +322,11 @@
 
         function startGame() {
             startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            pauseScreen.style.display = 'none';
             gameRunning = true;
             gameStarted = true;
+            paused = false;
             
             snake = [{x: 10, y: 10}];
             dx = 0;
@@ -306,7 +342,14 @@
 
         function gameOver() {
             gameRunning = false;
+            // Update high score if needed
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('highScore', highScore);
+                highScoreElement.textContent = highScore;
+            }
             finalScoreElement.textContent = score;
+            gameOverSound.play();
             gameOverScreen.style.display = 'block';
         }
 
@@ -316,8 +359,19 @@
         }
 
         document.addEventListener('keydown', (e) => {
+            // Space bar to start the game if not started
             if (!gameStarted && e.key === ' ') {
                 startGame();
+                return;
+            }
+            
+            // Toggle pause/resume with the 'p' key if game is running
+            if (gameRunning && e.key.toLowerCase() === 'p') {
+                paused = !paused;
+                pauseScreen.style.display = paused ? 'block' : 'none';
+                if (!paused) {
+                    gameLoop();
+                }
                 return;
             }
             

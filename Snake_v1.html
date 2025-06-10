@@ -6,9 +6,7 @@
     <title>Nokia Snake Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body::-webkit-scrollbar {
-            display: none;
-        }
+        body::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-pink-300 via-pink-100 to-pink-50 min-h-screen flex items-center justify-center">
@@ -19,7 +17,8 @@
         </header>
         <div class="flex items-center justify-center">
             <div class="bg-gray-700 p-4 rounded-xl shadow-2xl">
-                <div class="relative bg-gray-900 border-8 border-gray-700 rounded-lg overflow-hidden">
+                <!-- Arcade machine style: asymmetric borders -->
+                <div class="relative bg-gray-900 border-t-4 border-x-8 border-b-12 border-gray-700 rounded-lg overflow-hidden">
                     <canvas id="gameCanvas" width="600" height="600" class="block mx-auto"></canvas>
                     <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg transition-all duration-300">
                         <div class="text-6xl mb-4 animate-bounce">🐍</div>
@@ -109,6 +108,15 @@
                     }
                 }
             }
+            const shapes = ["circle", "square", "triangle"];
+            newFood.shape = shapes[Math.floor(Math.random() * shapes.length)];
+            const colorPalettes = [
+                {stop0: "#ff007f", stop1: "#ff8c00", stop2: "#ffff00"},
+                {stop0: "#00fff0", stop1: "#00ff00", stop2: "#007fff"},
+                {stop0: "#ff00ff", stop1: "#ff1493", stop2: "#ffa500"},
+                {stop0: "#adff2f", stop1: "#32cd32", stop2: "#7fff00"}
+            ];
+            newFood.palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
             food = newFood;
         }
 
@@ -150,20 +158,31 @@
                 }
             }
 
-            // Enhanced food design with a colorful glow effect
-            const foodX = food.x * gridSize + gridSize / 2;
-            const foodY = food.y * gridSize + gridSize / 2;
+            // Enhanced food design with a randomized shape, gradient, and glow
+            const foodCenterX = food.x * gridSize + gridSize / 2;
+            const foodCenterY = food.y * gridSize + gridSize / 2;
             ctx.save();
             ctx.shadowColor = "#ff00ff";
             ctx.shadowBlur = 15;
-            const foodGradient = ctx.createRadialGradient(foodX, foodY, gridSize / 8, foodX, foodY, gridSize / 2);
-            foodGradient.addColorStop(0, "#ff007f");
-            foodGradient.addColorStop(0.5, "#ff8c00");
-            foodGradient.addColorStop(1, "#ffff00");
-            ctx.fillStyle = foodGradient;
-            ctx.beginPath();
-            ctx.arc(foodX, foodY, gridSize / 2 - 2, 0, 2 * Math.PI);
-            ctx.fill();
+            const grad = ctx.createRadialGradient(foodCenterX, foodCenterY, gridSize / 8, foodCenterX, foodCenterY, gridSize / 2);
+            grad.addColorStop(0, food.palette.stop0);
+            grad.addColorStop(0.5, food.palette.stop1);
+            grad.addColorStop(1, food.palette.stop2);
+            ctx.fillStyle = grad;
+            if (food.shape === "circle") {
+                ctx.beginPath();
+                ctx.arc(foodCenterX, foodCenterY, gridSize / 2 - 2, 0, 2 * Math.PI);
+                ctx.fill();
+            } else if (food.shape === "square") {
+                ctx.fillRect(food.x * gridSize + 2, food.y * gridSize + 2, gridSize - 4, gridSize - 4);
+            } else if (food.shape === "triangle") {
+                ctx.beginPath();
+                ctx.moveTo(foodCenterX, foodCenterY - (gridSize / 2 - 2));
+                ctx.lineTo(foodCenterX - (gridSize / 2 - 2), foodCenterY + (gridSize / 2 - 2));
+                ctx.lineTo(foodCenterX + (gridSize / 2 - 2), foodCenterY + (gridSize / 2 - 2));
+                ctx.closePath();
+                ctx.fill();
+            }
             ctx.restore();
         }
 

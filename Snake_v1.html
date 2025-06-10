@@ -115,6 +115,7 @@
         function drawGame() {
             ctx.fillStyle = '#1a252f';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
             if (snakeStyle === "cylindrical") {
                 for (let segment of snake) {
                     const centerX = segment.x * gridSize + gridSize / 2;
@@ -148,15 +149,22 @@
                     ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
                 }
             }
-            const gradient = ctx.createLinearGradient(food.x * gridSize, food.y * gridSize, food.x * gridSize + gridSize, food.y * gridSize + gridSize);
-            gradient.addColorStop(0, '#ffecd2');
-            gradient.addColorStop(1, '#fcb69f');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
-            ctx.fillStyle = '#1a252f';
-            const centerOffset = Math.floor(gridSize / 4);
-            const centerSize = Math.floor(gridSize / 2);
-            ctx.fillRect(food.x * gridSize + centerOffset, food.y * gridSize + centerOffset, centerSize, centerSize);
+
+            // Enhanced food design with a colorful glow effect
+            const foodX = food.x * gridSize + gridSize / 2;
+            const foodY = food.y * gridSize + gridSize / 2;
+            ctx.save();
+            ctx.shadowColor = "#ff00ff";
+            ctx.shadowBlur = 15;
+            const foodGradient = ctx.createRadialGradient(foodX, foodY, gridSize / 8, foodX, foodY, gridSize / 2);
+            foodGradient.addColorStop(0, "#ff007f");
+            foodGradient.addColorStop(0.5, "#ff8c00");
+            foodGradient.addColorStop(1, "#ffff00");
+            ctx.fillStyle = foodGradient;
+            ctx.beginPath();
+            ctx.arc(foodX, foodY, gridSize / 2 - 2, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
         }
 
         let lastTime = 0;

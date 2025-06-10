@@ -6,61 +6,70 @@
     <title>Nokia Snake Game</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar hide and smoother transitions */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-pink-300 via-pink-100 to-pink-50 flex flex-col items-center justify-center min-h-screen overflow-hidden">
-    <!-- Audio elements for sound effects -->
-    <audio id="eatSound" src="assets/eat.wav"></audio>
-    <audio id="gameOverSound" src="assets/gameover.wav"></audio>
-    
-    <div class="container mx-auto px-4">
+<body class="bg-gradient-to-br from-pink-300 via-pink-100 to-pink-50 min-h-screen flex items-center justify-center">
+    <main class="w-full max-w-3xl px-4">
         <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-gray-800">SNAKE</h1>
-            <p class="text-lg text-gray-700 mt-2">Score: <span id="score">0</span> | High Score: <span id="highScore">0</span></p>
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">SNAKE</h1>
+            <p class="text-lg text-gray-700">Score: <span id="score">0</span> | High Score: <span id="highScore">0</span></p>
         </header>
-    
-        <div class="relative">
-            <canvas id="gameCanvas" width="600" height="600" class="bg-gray-800 border-4 border-gray-600 rounded-lg shadow-lg"></canvas>
-            
-            <!-- Start screen with snake style selector -->
-            <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 rounded-lg shadow-md">
-                <div class="text-6xl mb-4">🐍</div>
-                <p class="text-2xl font-semibold text-gray-800 mb-2">NOKIA SNAKE</p>
-                <div class="mb-4">
-                    <label for="snakeStyleSelector" class="text-sm text-gray-700">Select Snake Style:</label>
-                    <select id="snakeStyleSelector" class="mt-1 px-2 py-1 border border-gray-400 rounded shadow">
-                        <option value="classic">Classic</option>
-                        <option value="cylindrical">Cylindrical</option>
-                        <option value="neon">Neon</option>
-                        <option value="pixel">Pixel</option>
-                    </select>
+
+        <!-- Arcade machine style container with arcade-like borders -->
+        <div class="flex items-center justify-center">
+            <!-- Outer arcade cabinet frame -->
+            <div class="bg-gray-700 p-4 rounded-xl shadow-2xl">
+                <!-- Inner screen with custom non-uniform borders -->
+                <div class="relative bg-gray-900 border-8 border-gray-700 rounded-lg overflow-hidden">
+                    <canvas id="gameCanvas" width="600" height="600" class="block mx-auto"></canvas>
+                    
+                    <!-- Start screen with snake style selector -->
+                    <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg transition-all duration-300">
+                        <div class="text-6xl mb-4 animate-bounce">🐍</div>
+                        <p class="text-2xl font-semibold text-gray-800 mb-2">NOKIA SNAKE</p>
+                        <div class="mb-4">
+                            <label for="snakeStyleSelector" class="block text-sm text-gray-700 mb-1">Select Snake Style:</label>
+                            <select id="snakeStyleSelector" class="w-full px-2 py-1 border border-gray-400 rounded shadow">
+                                <option value="classic">Classic</option>
+                                <option value="cylindrical">Cylindrical</option>
+                                <option value="neon">Neon</option>
+                                <option value="pixel">Pixel</option>
+                            </select>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Use arrow keys to play</p>
+                        <button onclick="startGame()" class="px-6 py-2 bg-gray-800 text-pink-100 font-bold rounded hover:bg-gray-700 transition transform hover:scale-105">
+                            START
+                        </button>
+                    </div>
+        
+                    <!-- Game over screen -->
+                    <div id="gameOver" class="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg shadow-md hidden transition-opacity duration-300">
+                        <p class="text-2xl font-semibold text-gray-800 mb-2">GAME OVER</p>
+                        <p class="text-lg text-gray-700 mb-4">Score: <span id="finalScore">0</span></p>
+                        <button onclick="restartGame()" class="px-6 py-2 bg-gray-800 text-pink-100 font-bold rounded hover:bg-gray-700 transition transform hover:scale-105">
+                            RESTART
+                        </button>
+                    </div>
+        
+                    <!-- Pause overlay -->
+                    <div id="pauseScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg shadow-md hidden transition-opacity duration-300">
+                        <p class="text-2xl font-bold text-gray-800">PAUSED</p>
+                        <p class="text-sm text-gray-700 mt-1">Press "P" to resume</p>
+                    </div>
                 </div>
-                <p class="text-sm text-gray-600 mb-4">Use arrow keys to play</p>
-                <button onclick="startGame()" class="px-6 py-2 bg-gray-800 text-pink-100 font-bold rounded hover:bg-gray-700 transition transform hover:scale-105">
-                    START
-                </button>
-            </div>
-    
-            <!-- Game over screen -->
-            <div id="gameOver" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 rounded-lg shadow-md hidden">
-                <p class="text-2xl font-semibold text-gray-800 mb-2">GAME OVER</p>
-                <p class="text-lg text-gray-700 mb-4">Score: <span id="finalScore">0</span></p>
-                <button onclick="restartGame()" class="px-6 py-2 bg-gray-800 text-pink-100 font-bold rounded hover:bg-gray-700 transition transform hover:scale-105">
-                    RESTART
-                </button>
-            </div>
-    
-            <!-- Pause overlay -->
-            <div id="pauseScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 rounded-lg shadow-md hidden">
-                <p class="text-2xl font-bold text-gray-800">PAUSED</p>
-                <p class="text-sm text-gray-700 mt-1">Press "P" to resume</p>
             </div>
         </div>
-    
+        
         <div class="controls text-center mt-6 text-gray-700">
-            <p>Use ↑ ↓ ← → arrow keys to play</p>
+            <p>Use ↑ ↓ ← → arrow keys or swipe to play</p>
             <p>Eat food to grow and score points</p>
         </div>
-    </div>
+    </main>
     
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -89,18 +98,37 @@
         let highScore = Number(localStorage.getItem('highScore')) || 0;
         highScoreElement.textContent = highScore;
 
+        // Create audio elements dynamically for better control
+        function createAudioElements() {
+            const eat = document.createElement('audio');
+            eat.id = "eatSound";
+            eat.src = "assets/eat.wav";
+            document.body.appendChild(eat);
+            const gameOverAud = document.createElement('audio');
+            gameOverAud.id = "gameOverSound";
+            gameOverAud.src = "assets/gameover.wav";
+            document.body.appendChild(gameOverAud);
+        }
+        if (!document.getElementById('eatSound')) createAudioElements();
+
         // Returns a random food position not on the snake
         function randomFood() {
-            food = {
-                x: Math.floor(Math.random() * tileCount),
-                y: Math.floor(Math.random() * tileCount)
-            };
-            for (let segment of snake) {
-                if (segment.x === food.x && segment.y === food.y) {
-                    randomFood();
-                    return;
+            let valid = false;
+            let newFood;
+            while (!valid) {
+                newFood = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+                valid = true;
+                for (let segment of snake) {
+                    if (segment.x === newFood.x && segment.y === newFood.y) {
+                        valid = false;
+                        break;
+                    }
                 }
             }
+            food = newFood;
         }
 
         // Draw game elements with different snake styles
@@ -110,11 +138,10 @@
             
             // Draw snake
             if (snakeStyle === "cylindrical") {
-                // Cylindrical snake: Each segment is drawn as a circle with a radial gradient.
                 for (let segment of snake) {
-                    let centerX = segment.x * gridSize + gridSize / 2;
-                    let centerY = segment.y * gridSize + gridSize / 2;
-                    let gradient = ctx.createRadialGradient(centerX, centerY, gridSize / 4, centerX, centerY, gridSize / 2);
+                    const centerX = segment.x * gridSize + gridSize / 2;
+                    const centerY = segment.y * gridSize + gridSize / 2;
+                    const gradient = ctx.createRadialGradient(centerX, centerY, gridSize / 4, centerX, centerY, gridSize / 2);
                     gradient.addColorStop(0, "#ff9a9e");
                     gradient.addColorStop(1, "#1a252f");
                     ctx.fillStyle = gradient;
@@ -123,7 +150,6 @@
                     ctx.fill();
                 }
             } else if (snakeStyle === "neon") {
-                // Neon snake: Bright glowing segments.
                 ctx.shadowColor = "#39ff14";
                 ctx.shadowBlur = 20;
                 for (let segment of snake) {
@@ -132,13 +158,11 @@
                 }
                 ctx.shadowBlur = 0;
             } else if (snakeStyle === "pixel") {
-                // Pixel snake: Crisp blocks with a retro vibe.
                 for (let segment of snake) {
                     ctx.fillStyle = "#e3342f";
                     ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 1, gridSize - 1);
                 }
             } else {
-                // Classic snake: Multiple colored blocks.
                 const colors = ['#fad0c4', '#ff9a9e', '#fbc2eb', '#a18cd1'];
                 for (let i = 0; i < snake.length; i++) {
                     ctx.fillStyle = colors[i % colors.length];
@@ -147,27 +171,24 @@
                 }
             }
             
-            // Draw food with a gradient effect.
+            // Draw food with gradient effect and center dot
             const gradient = ctx.createLinearGradient(food.x * gridSize, food.y * gridSize, food.x * gridSize + gridSize, food.y * gridSize + gridSize);
             gradient.addColorStop(0, '#ffecd2');
             gradient.addColorStop(1, '#fcb69f');
             ctx.fillStyle = gradient;
             ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
             
-            // Center dot on food
             ctx.fillStyle = '#1a252f';
             const centerOffset = Math.floor(gridSize / 4);
             const centerSize = Math.floor(gridSize / 2);
             ctx.fillRect(food.x * gridSize + centerOffset, food.y * gridSize + centerOffset, centerSize, centerSize);
         }
 
-        // Smooth game loop using requestAnimationFrame and a dynamic interval.
         let lastTime = 0;
         function gameLoop(timestamp) {
             if (!gameRunning || paused) return;
             if (!lastTime) lastTime = timestamp;
             const delta = timestamp - lastTime;
-            // Calculate interval: starts slow and speeds up as score increases.
             const interval = Math.max(80, 500 - score * 5);
             if (delta > interval) {
                 moveSnake();
@@ -181,12 +202,10 @@
             if (dx === 0 && dy === 0) return;
             const head = {x: snake[0].x + dx, y: snake[0].y + dy};
             
-            // Check wall collisions
             if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
                 gameOver();
                 return;
             }
-            // Check self-collision
             for (let segment of snake) {
                 if (head.x === segment.x && head.y === segment.y) {
                     gameOver();
@@ -197,7 +216,7 @@
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 scoreElement.textContent = score;
-                if (eatSound) eatSound.play();
+                document.getElementById('eatSound').play();
                 randomFood();
             } else {
                 snake.pop();
@@ -205,7 +224,6 @@
         }
 
         function startGame() {
-            // Set snake style from the selector.
             snakeStyle = snakeStyleSelector.value;
             startScreen.classList.add("hidden");
             gameOverScreen.classList.add("hidden");
@@ -230,7 +248,7 @@
                 highScoreElement.textContent = highScore;
             }
             finalScoreElement.textContent = score;
-            if (gameOverSound) gameOverSound.play();
+            document.getElementById('gameOverSound').play();
             gameOverScreen.classList.remove("hidden");
         }
 
@@ -240,7 +258,6 @@
         }
 
         document.addEventListener('keydown', (e) => {
-            // Start game with space if not yet started.
             if (!gameStarted && e.key === ' ') {
                 startGame();
                 return;
@@ -297,6 +314,7 @@
             }
         });
     
+        // Initial draw so that canvas is not blank.
         drawGame();
     </script>
 </body>

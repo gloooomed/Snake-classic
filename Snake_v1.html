@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nokia Snake Game</title>
+    <title>Classic Snake Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body::-webkit-scrollbar { display: none; }
@@ -12,7 +12,7 @@
 <body class="bg-gradient-to-br from-pink-300 via-pink-100 to-pink-50 min-h-screen flex items-center justify-center">
     <main class="w-full max-w-3xl px-4">
         <header class="text-center mb-6">
-            <h1 class="text-5xl font-bold text-gray-800 mb-2">SNAKE</h1>
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">CLASSIC SNAKE</h1>
             <p class="text-lg text-gray-700">Score: <span id="score">0</span> | High Score: <span id="highScore">0</span></p>
         </header>
         <div class="flex items-center justify-center">
@@ -22,7 +22,7 @@
                     <canvas id="gameCanvas" width="600" height="600" class="block mx-auto"></canvas>
                     <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg transition-all duration-300">
                         <div class="text-6xl mb-4 animate-bounce">🐍</div>
-                        <p class="text-2xl font-semibold text-gray-800 mb-2">NOKIA SNAKE</p>
+                        <p class="text-2xl font-semibold text-gray-800 mb-2">Classic Snake</p>
                         <div class="mb-4">
                             <label for="snakeStyleSelector" class="block text-sm text-gray-700 mb-1">Select Snake Style:</label>
                             <select id="snakeStyleSelector" class="w-full px-2 py-1 border border-gray-400 rounded shadow">

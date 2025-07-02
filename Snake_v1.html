@@ -17,7 +17,6 @@
         </header>
         <div class="flex items-center justify-center">
             <div class="bg-gray-700 p-4 rounded-xl shadow-2xl">
-                <!-- Arcade machine style: asymmetric borders -->
                 <div class="relative bg-gray-900 border-t-4 border-x-8 border-b-12 border-gray-700 rounded-lg overflow-hidden">
                     <canvas id="gameCanvas" width="600" height="600" class="block mx-auto"></canvas>
                     <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg transition-all duration-300">
@@ -150,7 +149,6 @@
                     ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 1, gridSize - 1);
                 }
             } else {
-                // Classic style: use stored color if available
                 const defaultColors = ['#fad0c4', '#ff9a9e', '#fbc2eb', '#a18cd1'];
                 for (let i = 0; i < snake.length; i++) {
                     const segment = snake[i];
@@ -163,7 +161,6 @@
                 }
             }
 
-            // Enhanced food design with a randomized shape, gradient, and glow
             const foodCenterX = food.x * gridSize + gridSize / 2;
             const foodCenterY = food.y * gridSize + gridSize / 2;
             ctx.save();
@@ -222,8 +219,6 @@
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 scoreElement.textContent = score;
-                document.getElementById('eatSound').play();
-                // Apply food color (using middle color stop) to the new head block
                 head.color = food.palette.stop1;
                 randomFood();
             } else {

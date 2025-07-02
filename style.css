@@ -1,3 +1,29 @@
 body::-webkit-scrollbar {
     display: none;
 }
+
+
+@media (max-width: 640px) {
+    main {
+        max-width: 100%;
+        padding: 1rem;
+    }
+    canvas {
+        width: 90vw;
+        height: auto;
+    }
+    header h1 {
+        font-size: 2rem;
+    }
+    header p {
+        font-size: 1rem;
+    }
+}
+
+
+@media (max-width: 1024px) {
+
+    main {
+        padding: 1.5rem;
+    }
+}

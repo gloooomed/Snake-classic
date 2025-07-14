@@ -22,12 +22,6 @@ This is a modern spin on the timeless Snake game, built using simple HTML, CSS, 
 
 - A modern web browser (Chrome, Firefox, Safari, Edge, etc.)
 
-### Installation
-
-1. Clone or download this repository.
-2. Navigate to the project folder.
-3. Open the `index.html` file in your browser and start playing.
-
 ## Project Structure
 
 ```

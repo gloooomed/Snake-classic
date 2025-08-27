@@ -2,6 +2,9 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+.hidden {
+    display: none !important;
+}
 
 @media (max-width: 640px) {
     main {

@@ -25,6 +25,7 @@ let difficulty = "medium";
 let snake = [{x: 10, y: 10}];
 let food = {x: 15, y: 15};
 let powerUp = null;
+let obstacles = [];
 let dx = 0, dy = 0;
 let score = 0;
 let lives = 3;
@@ -40,9 +41,9 @@ let speedMultiplier = 1;
 
 // Difficulty settings
 const difficultySettings = {
-    easy: { baseSpeed: 300, powerUpChance: 0.4 },
-    medium: { baseSpeed: 200, powerUpChance: 0.3 },
-    hard: { baseSpeed: 120, powerUpChance: 0.2 }
+    easy: { baseSpeed: 300, powerUpChance: 0.4, obstacleChance: 0 },
+    medium: { baseSpeed: 200, powerUpChance: 0.3, obstacleChance: 0.1 },
+    hard: { baseSpeed: 120, powerUpChance: 0.2, obstacleChance: 0.2 }
 };
 
 highScoreElement.textContent = highScore;
@@ -133,12 +134,68 @@ function createPowerUp() {
         if (valid && food && newPowerUp.x === food.x && newPowerUp.y === food.y) {
             valid = false;
         }
+        if (valid) {
+            for (let obstacle of obstacles) {
+                if (newPowerUp.x === obstacle.x && newPowerUp.y === obstacle.y) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
     }
     
     const types = Object.keys(powerUpTypes);
     newPowerUp.type = types[Math.floor(Math.random() * types.length)];
     newPowerUp.data = powerUpTypes[newPowerUp.type];
     return newPowerUp;
+}
+
+function createObstacle() {
+    if (gameMode === 'classic' || Math.random() > difficultySettings[difficulty].obstacleChance) {
+        return null;
+    }
+    
+    let valid = false, newObstacle;
+    let attempts = 0;
+    while (!valid && attempts < 10) {
+        newObstacle = {
+            x: Math.floor(Math.random() * tileCount),
+            y: Math.floor(Math.random() * tileCount)
+        };
+        valid = true;
+        
+        // Check collision with snake
+        for (let segment of snake) {
+            if (segment.x === newObstacle.x && segment.y === newObstacle.y) {
+                valid = false;
+                break;
+            }
+        }
+        
+        // Check collision with food
+        if (valid && food && newObstacle.x === food.x && newObstacle.y === food.y) {
+            valid = false;
+        }
+        
+        // Check collision with power-up
+        if (valid && powerUp && newObstacle.x === powerUp.x && newObstacle.y === powerUp.y) {
+            valid = false;
+        }
+        
+        // Check collision with existing obstacles
+        if (valid) {
+            for (let obstacle of obstacles) {
+                if (newObstacle.x === obstacle.x && newObstacle.y === obstacle.y) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        
+        attempts++;
+    }
+    
+    return valid ? newObstacle : null;
 }
 
 function applyPowerUp(type) {
@@ -204,6 +261,14 @@ function randomFood() {
         if (valid && powerUp && newFood.x === powerUp.x && newFood.y === powerUp.y) {
             valid = false;
         }
+        if (valid) {
+            for (let obstacle of obstacles) {
+                if (newFood.x === obstacle.x && newFood.y === obstacle.y) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
     }
     
     // Chance for golden food (higher points)
@@ -229,6 +294,14 @@ function randomFood() {
     // Maybe create a power-up
     if (!powerUp && Math.random() < 0.3) {
         powerUp = createPowerUp();
+    }
+    
+    // Maybe create an obstacle (in arcade mode on higher difficulties)
+    if (gameMode === 'arcade' && obstacles.length < 5 && Math.random() < 0.15) {
+        const newObstacle = createObstacle();
+        if (newObstacle) {
+            obstacles.push(newObstacle);
+        }
     }
 }
 
@@ -334,6 +407,14 @@ function drawGame() {
         ctx.fillText(powerUp.data.emoji, powerUpCenterX, powerUpCenterY + 5);
         ctx.restore();
     }
+
+    // Draw obstacles
+    for (let obstacle of obstacles) {
+        ctx.fillStyle = '#666';
+        ctx.fillRect(obstacle.x * gridSize + 1, obstacle.y * gridSize + 1, gridSize - 2, gridSize - 2);
+        ctx.fillStyle = '#999';
+        ctx.fillRect(obstacle.x * gridSize + 3, obstacle.y * gridSize + 3, gridSize - 6, gridSize - 6);
+    }
 }
 
 let lastTime = 0;
@@ -367,8 +448,18 @@ function moveSnake() {
         return;
     }
     
-    // Self collision (unless invincible)
+    // Obstacle collision (unless invincible)
     const isInvincible = activePowerUpEffects.some(effect => effect.type === 'invincible');
+    if (!isInvincible) {
+        for (let obstacle of obstacles) {
+            if (head.x === obstacle.x && head.y === obstacle.y) {
+                handleCollision();
+                return;
+            }
+        }
+    }
+    
+    // Self collision (unless invincible)
     if (!isInvincible) {
         for (let segment of snake) {
             if (head.x === segment.x && head.y === segment.y) {
@@ -461,6 +552,7 @@ function startGame() {
     activePowerUpEffects = [];
     speedMultiplier = 1;
     powerUp = null;
+    obstacles = [];
     
     scoreElement.textContent = score;
     livesElement.textContent = lives;
